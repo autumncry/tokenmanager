@@ -23,6 +23,7 @@
     "build": "swift build",
     "build:release": "swift build -c release",
     "build:app": "./script/package_app.sh",
+    "package:app": "./script/make_app_zip.sh",
     "package:pkg": "./script/make_pkg.sh",
     "package:dmg": "./script/make_dmg.sh"
   },

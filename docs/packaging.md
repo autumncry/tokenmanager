@@ -36,6 +36,20 @@ dist/tokenmanager-0.1.0.pkg
 
 The package installs `tokenmanager.app` into `/Applications`.
 
+## Zipped App Bundle
+
+```sh
+./script/make_app_zip.sh
+```
+
+Output:
+
+```text
+dist/tokenmanager-0.1.0.app.zip
+```
+
+The zip is intended for GitHub Release upload as the direct `.app` download.
+
 ## Disk Image
 
 ```sh

@@ -13,10 +13,20 @@ final class TokenManagerAppModel: ObservableObject {
     let catalog = ProviderCatalog.default
     private let configStore = TokenManagerConfigStore.default
     private let credentialStore = KeychainCredentialStore()
+    let isDemoMode: Bool
 
     init() {
-        self.config = (try? self.configStore.load()) ?? TokenManagerConfig()
-        self.selectedProviderID = self.catalog.providers.first?.id
+        let arguments = Set(CommandLine.arguments)
+        self.isDemoMode = arguments.contains("--demo") || ProcessInfo.processInfo.environment["TOKENMANAGER_DEMO_MODE"] == "1"
+        if self.isDemoMode {
+            self.config = DemoDataFactory.config()
+            let demoSnapshots = DemoDataFactory.snapshots()
+            self.snapshots = Dictionary(uniqueKeysWithValues: demoSnapshots.map { ($0.providerID, $0) })
+            self.selectedProviderID = .volcengineArk
+        } else {
+            self.config = (try? self.configStore.load()) ?? TokenManagerConfig()
+            self.selectedProviderID = self.catalog.providers.first?.id
+        }
     }
 
     var enabledAccounts: [ProviderAccount] {
@@ -87,6 +97,11 @@ final class TokenManagerAppModel: ObservableObject {
     }
 
     func refreshEnabledAccounts() async {
+        if self.isDemoMode {
+            let demoSnapshots = DemoDataFactory.snapshots()
+            self.snapshots = Dictionary(uniqueKeysWithValues: demoSnapshots.map { ($0.providerID, $0) })
+            return
+        }
         self.isRefreshing = true
         defer { self.isRefreshing = false }
         for account in self.enabledAccounts {
@@ -95,6 +110,10 @@ final class TokenManagerAppModel: ObservableObject {
     }
 
     func refresh(providerID: ProviderID) async {
+        if self.isDemoMode {
+            self.snapshots[providerID] = DemoDataFactory.snapshots().first { $0.providerID == providerID }
+            return
+        }
         guard let account = self.account(for: providerID) else {
             self.errors[providerID] = "Add an API key or enable manual tracking first."
             return

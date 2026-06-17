@@ -35,6 +35,8 @@ public enum ProviderBalanceParser {
             return try self.parseOpenRouter(json, receivedAt: receivedAt)
         case .openAI:
             return try self.parseOpenAICosts(json, receivedAt: receivedAt)
+        case .volcengineArk:
+            return try self.parseVolcengineCodingPlan(json, receivedAt: receivedAt)
         default:
             return try self.parseGeneric(providerID: providerID, json: json, receivedAt: receivedAt)
         }
@@ -165,6 +167,39 @@ public enum ProviderBalanceParser {
             updatedAt: receivedAt)
     }
 
+    private static func parseVolcengineCodingPlan(_ json: [String: Any], receivedAt: Date) throws -> ProviderUsageSnapshot {
+        let result = dictionary(json["Result"]) ?? dictionary(json["result"]) ?? dictionary(json["data"]) ?? json
+        let currency = string(result["Currency"] ?? result["currency"]) ?? "CNY"
+        let balance = decimal(result["Balance"] ?? result["balance"])
+        let rawWindows = (result["Windows"] as? [[String: Any]])
+            ?? (result["windows"] as? [[String: Any]])
+            ?? (result["QuotaWindows"] as? [[String: Any]])
+            ?? []
+        let windows = rawWindows.compactMap { window -> QuotaWindow? in
+            guard
+                let id = string(window["Id"] ?? window["id"]),
+                let title = string(window["Title"] ?? window["title"])
+            else { return nil }
+            return QuotaWindow(
+                id: id,
+                title: title,
+                used: decimal(window["Used"] ?? window["used"]),
+                limit: decimal(window["Limit"] ?? window["limit"]),
+                unit: string(window["Unit"] ?? window["unit"]) ?? "tokens",
+                resetsAt: date(window["ResetAt"] ?? window["resetAt"] ?? window["reset_at"]))
+        }
+        guard balance != nil || !windows.isEmpty else {
+            throw ProviderBalanceParserError.missingExpectedFields(.volcengineArk)
+        }
+        return ProviderUsageSnapshot(
+            providerID: .volcengineArk,
+            accountName: string(result["AccountName"] ?? result["accountName"] ?? result["Name"] ?? result["name"]),
+            balance: balance.map { MoneyAmount(amount: $0, currency: currency) },
+            quotaWindows: windows,
+            source: "Volcengine Ark Coding Plan API",
+            updatedAt: receivedAt)
+    }
+
     private static func parseGeneric(
         providerID: ProviderID,
         json: [String: Any],
@@ -211,5 +246,11 @@ public enum ProviderBalanceParser {
         default:
             nil
         }
+    }
+
+    private static func date(_ value: Any?) -> Date? {
+        guard let value = string(value) else { return nil }
+        let formatter = ISO8601DateFormatter()
+        return formatter.date(from: value)
     }
 }

@@ -59,4 +59,8 @@ if command -v codesign >/dev/null 2>&1; then
   codesign --force --deep --sign - "$APP_BUNDLE" >/dev/null
 fi
 
+if command -v xattr >/dev/null 2>&1; then
+  xattr -cr "$APP_BUNDLE" >/dev/null 2>&1 || true
+fi
+
 echo "$APP_BUNDLE"

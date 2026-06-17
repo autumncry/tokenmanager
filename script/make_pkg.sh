@@ -12,7 +12,10 @@ PKG_PATH="$DIST_DIR/tokenmanager-$VERSION.pkg"
 
 rm -rf "$STAGE_DIR" "$PKG_PATH"
 mkdir -p "$STAGE_DIR/Applications"
-cp -R "$APP_BUNDLE" "$STAGE_DIR/Applications/"
+COPYFILE_DISABLE=1 ditto --norsrc "$APP_BUNDLE" "$STAGE_DIR/Applications/tokenmanager.app"
+if command -v xattr >/dev/null 2>&1; then
+  xattr -cr "$STAGE_DIR" >/dev/null 2>&1 || true
+fi
 
 pkgbuild \
   --root "$STAGE_DIR" \

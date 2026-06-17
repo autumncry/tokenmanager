@@ -12,7 +12,10 @@ APP_BUNDLE="$DIST_DIR/tokenmanager.app"
 
 rm -rf "$STAGE_DIR" "$DMG_PATH"
 mkdir -p "$STAGE_DIR"
-cp -R "$APP_BUNDLE" "$STAGE_DIR/"
+COPYFILE_DISABLE=1 ditto --norsrc "$APP_BUNDLE" "$STAGE_DIR/tokenmanager.app"
+if command -v xattr >/dev/null 2>&1; then
+  xattr -cr "$STAGE_DIR" >/dev/null 2>&1 || true
+fi
 ln -s /Applications "$STAGE_DIR/Applications"
 
 hdiutil create \
