@@ -1,0 +1,47 @@
+{
+  "name": "tokenmanager",
+  "version": "0.1.0",
+  "description": "Local-first macOS menu bar app for tracking AI API balances, usage, quotas, and coding plans.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "tokenmanager": "npm/tokenmanager.mjs",
+    "tokenmanagerctl": "npm/tokenmanagerctl.mjs"
+  },
+  "files": [
+    "Package.swift",
+    "Sources",
+    "Tests",
+    "script",
+    "npm",
+    "docs",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "swift test",
+    "build": "swift build",
+    "build:release": "swift build -c release",
+    "build:app": "./script/package_app.sh",
+    "package:pkg": "./script/make_pkg.sh",
+    "package:dmg": "./script/make_dmg.sh"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "os": [
+    "darwin"
+  ],
+  "cpu": [
+    "arm64",
+    "x64"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/autumncry/tokenmanager.git"
+  },
+  "bugs": {
+    "url": "https://github.com/autumncry/tokenmanager/issues"
+  },
+  "homepage": "https://github.com/autumncry/tokenmanager#readme"
+}
