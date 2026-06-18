@@ -21,6 +21,8 @@ enum TokenManagerCLI {
         switch command {
         case "providers":
             try Self.printProviders(json: arguments.contains("--json"))
+        case "balance":
+            try await Self.printBalance(Array(arguments.dropFirst()), json: arguments.contains("--json"))
         case "config":
             try await Self.runConfig(Array(arguments.dropFirst()))
         case "status":
@@ -69,6 +71,35 @@ enum TokenManagerCLI {
             try await Self.setAPIKey(Array(arguments.dropFirst()))
         default:
             throw CLIError.unknownCommand("config \(subcommand)")
+        }
+    }
+
+    private static func printBalance(_ arguments: [String], json: Bool) async throws {
+        let providerName = try requiredValue(after: "--provider", in: arguments)
+        let provider = try ProviderCatalog.default.resolve(providerName).orThrow(CLIError.unknownProvider(providerName))
+        let client = ProviderBalanceClient(credentialStore: KeychainCredentialStore())
+        let snapshot: ProviderUsageSnapshot
+
+        if let apiKey = try Self.apiKeyArgument(in: arguments) {
+            snapshot = try await client.refresh(providerID: provider.id, apiKey: apiKey)
+        } else {
+            let config = try TokenManagerConfigStore.default.load()
+            guard let account = config.accounts.first(where: { $0.providerID == provider.id && $0.isEnabled }) else {
+                throw CLIError.missingArgument("api key or saved provider account")
+            }
+            snapshot = try await client.refresh(account: account)
+        }
+
+        if json {
+            let data = try JSONEncoder.tokenManager.encode(snapshot)
+            print(String(decoding: data, as: UTF8.self))
+            return
+        }
+
+        let balance = snapshot.balance.map(Self.display) ?? "—"
+        print("\(provider.displayName)\t\(balance)")
+        for item in snapshot.breakdown {
+            print("\(item.label)\t\(item.currency) \(NSDecimalNumber(decimal: item.amount).stringValue)")
         }
     }
 
@@ -134,6 +165,8 @@ enum TokenManagerCLI {
 
             Commands:
               providers [--json]                         List supported providers
+              balance --provider <id> [--stdin|--api-key <key>] [--json]
+                                                          Fetch a provider balance once
               status [--json]                            Show enabled local accounts
               config path                                Print config path
               config dump                                Print local config JSON
@@ -155,6 +188,18 @@ enum TokenManagerCLI {
         return value
     }
 
+    private static func apiKeyArgument(in arguments: [String]) throws -> String? {
+        if arguments.contains("--stdin") {
+            let value = String(data: FileHandle.standardInput.readDataToEndOfFile(), encoding: .utf8)?
+                .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            guard !value.isEmpty else {
+                throw CLIError.missingArgument("api key")
+            }
+            return value
+        }
+        return Self.value(after: "--api-key", in: arguments)
+    }
+
     private static func stableAccountID(providerID: ProviderID, name: String) -> UUID {
         let raw = "\(providerID.rawValue):\(name)".utf8.reduce(UInt64(14_695_981_039_346_656_037)) { hash, byte in
             (hash ^ UInt64(byte)) &* 1_099_511_628_211
@@ -162,6 +207,10 @@ enum TokenManagerCLI {
         let hex = String(format: "%016llx%016llx", raw, raw.byteSwapped)
         let uuidString = "\(hex.prefix(8))-\(hex.dropFirst(8).prefix(4))-\(hex.dropFirst(12).prefix(4))-\(hex.dropFirst(16).prefix(4))-\(hex.dropFirst(20).prefix(12))"
         return UUID(uuidString: uuidString) ?? UUID()
+    }
+
+    private static func display(_ amount: MoneyAmount) -> String {
+        "\(amount.currency) \(NSDecimalNumber(decimal: amount.amount).stringValue)"
     }
 }
 

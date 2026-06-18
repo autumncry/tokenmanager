@@ -51,6 +51,10 @@ final class TokenManagerAppModel: ObservableObject {
         self.account(for: providerID)?.isEnabled == true
     }
 
+    func hasCredential(_ providerID: ProviderID) -> Bool {
+        self.account(for: providerID)?.credentialReference != nil
+    }
+
     func setEnabled(_ enabled: Bool, providerID: ProviderID) {
         if let index = self.config.accounts.firstIndex(where: { $0.providerID == providerID }) {
             self.config.accounts[index].isEnabled = enabled

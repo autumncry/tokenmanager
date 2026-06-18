@@ -52,29 +52,47 @@ public enum ProviderBalanceParser {
     }
 
     private static func parseDeepSeek(_ json: [String: Any], receivedAt: Date) throws -> ProviderUsageSnapshot {
+        guard let infos = json["balance_infos"] as? [[String: Any]] else {
+            throw ProviderBalanceParserError.missingExpectedFields(.deepSeek)
+        }
+        let balances = infos.compactMap { info -> DeepSeekBalance? in
+            guard let total = decimal(info["total_balance"]) else { return nil }
+            return DeepSeekBalance(
+                currency: string(info["currency"]) ?? "CNY",
+                total: total,
+                granted: decimal(info["granted_balance"]),
+                toppedUp: decimal(info["topped_up_balance"]))
+        }
         guard
-            let infos = json["balance_infos"] as? [[String: Any]],
-            let first = infos.first,
-            let total = decimal(first["total_balance"])
+            let selected = balances.first(where: { $0.currency == "USD" && $0.total > 0 })
+                ?? balances.first(where: { $0.total > 0 })
+                ?? balances.first(where: { $0.currency == "USD" })
+                ?? balances.first
         else {
             throw ProviderBalanceParserError.missingExpectedFields(.deepSeek)
         }
-        let currency = string(first["currency"]) ?? "CNY"
         var breakdown: [BalanceBreakdown] = []
-        if let granted = decimal(first["granted_balance"]) {
-            breakdown.append(.init(label: "Granted", amount: granted, currency: currency))
+        if let granted = selected.granted {
+            breakdown.append(.init(label: "Granted", amount: granted, currency: selected.currency))
         }
-        if let toppedUp = decimal(first["topped_up_balance"]) {
-            breakdown.append(.init(label: "Topped up", amount: toppedUp, currency: currency))
+        if let toppedUp = selected.toppedUp {
+            breakdown.append(.init(label: "Topped up", amount: toppedUp, currency: selected.currency))
         }
         return ProviderUsageSnapshot(
             providerID: .deepSeek,
             accountName: nil,
-            balance: .init(amount: total, currency: currency),
+            balance: .init(amount: selected.total, currency: selected.currency),
             breakdown: breakdown,
-            isAvailable: (json["is_available"] as? Bool) ?? (total > 0),
+            isAvailable: (json["is_available"] as? Bool) ?? (selected.total > 0),
             source: "DeepSeek balance API",
             updatedAt: receivedAt)
+    }
+
+    private struct DeepSeekBalance {
+        let currency: String
+        let total: Decimal
+        let granted: Decimal?
+        let toppedUp: Decimal?
     }
 
     private static func parseMoonshot(_ json: [String: Any], receivedAt: Date) throws -> ProviderUsageSnapshot {

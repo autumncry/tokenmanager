@@ -160,6 +160,13 @@ private struct ProviderDashboard: View {
             }
             .background(Color(nsColor: .windowBackgroundColor))
             .navigationTitle(provider.displayName)
+            .onAppear {
+                self.displayName = self.model.account(for: provider.id)?.displayName ?? "\(provider.shortName) account"
+            }
+            .onChange(of: provider.id) { _, _ in
+                self.displayName = self.model.account(for: provider.id)?.displayName ?? "\(provider.shortName) account"
+                self.apiKey = ""
+            }
         } else {
             ContentUnavailableView(self.copy.selectProvider, systemImage: "chart.bar.doc.horizontal")
         }
@@ -373,7 +380,7 @@ struct AppCopy {
     var activeAccounts: String { self.pick("Active Accounts", "已启用账户") }
     var providerCatalog: String { self.pick("Provider Catalog", "厂商目录") }
     var providers: String { self.pick("Providers", "厂商") }
-    var providersSubtitle: String { self.pick("Enable the providers you want to track from the menu bar.", "启用需要在菜单栏追踪的模型厂商。") }
+    var providersSubtitle: String { self.pick("Choose a provider, paste a local API key, then test and refresh the balance.", "选择厂商，粘贴本地 API Key，然后测试并刷新余额。") }
     var privacy: String { self.pick("Privacy", "隐私") }
     var privacySubtitle: String { self.pick("All credentials, configuration, and account data stay on this Mac.", "所有凭据、配置和账户数据都保留在这台 Mac。") }
     var about: String { self.pick("About", "关于") }
@@ -408,7 +415,15 @@ struct AppCopy {
     var accountName: String { self.pick("Account name", "账户名称") }
     var apiKey: String { self.pick("API key", "API Key") }
     var apiOrAccessKey: String { self.pick("API key / access token", "API Key / 访问令牌") }
-    var saveKey: String { self.pick("Save Key", "保存密钥") }
+    var saveKey: String { self.pick("Save & Refresh", "保存并查询") }
+    var refreshBalance: String { self.pick("Refresh Balance", "刷新余额") }
+    var menuBarTracking: String { self.pick("Track in menu bar", "在菜单栏追踪") }
+    var savedCredential: String { self.pick("Saved in Keychain", "已保存到钥匙串") }
+    var noCredential: String { self.pick("No API key saved", "未保存 API Key") }
+    var pasteKeyPrompt: String { self.pick("Paste an API key. It is written only to macOS Keychain.", "粘贴 API Key。它只会写入 macOS 钥匙串。") }
+    var endpoint: String { self.pick("Endpoint", "接口") }
+    var latestResult: String { self.pick("Latest result", "最新结果") }
+    var liveAdapterUnavailable: String { self.pick("Live balance refresh is not connected for this provider yet.", "该厂商暂未接入实时余额刷新。") }
     var providerNotes: String { self.pick("Provider notes", "厂商说明") }
     var providerDocs: String { self.pick("Provider API docs", "厂商 API 文档") }
 

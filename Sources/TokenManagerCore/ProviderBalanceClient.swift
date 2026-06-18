@@ -61,13 +61,45 @@ public struct ProviderBalanceClient: Sendable {
         guard let provider = self.catalog.provider(id: account.providerID) else {
             throw ProviderBalanceClientError.providerNotFound(account.providerID)
         }
-        guard let endpoint = provider.endpoint else {
-            throw ProviderBalanceClientError.liveRefreshUnsupported(account.providerID)
-        }
         guard let credentialReference = account.credentialReference else {
             throw ProviderBalanceClientError.missingCredential(account.providerID)
         }
         let secret = try await self.credentialStore.load(credentialReference)
+        return try await self.refresh(provider: provider, account: account, secret: secret)
+    }
+
+    public func refresh(
+        providerID: ProviderID,
+        apiKey: String,
+        displayName: String? = nil,
+        baseURLOverride: URL? = nil) async throws -> ProviderUsageSnapshot
+    {
+        guard let provider = self.catalog.provider(id: providerID) else {
+            throw ProviderBalanceClientError.providerNotFound(providerID)
+        }
+        let trimmed = apiKey.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
+            throw ProviderBalanceClientError.missingCredential(providerID)
+        }
+        let account = ProviderAccount(
+            providerID: providerID,
+            displayName: displayName ?? "\(provider.shortName) account",
+            credentialReference: nil,
+            isEnabled: true,
+            refreshInterval: .manual,
+            baseURLOverride: baseURLOverride,
+            notes: nil)
+        return try await self.refresh(provider: provider, account: account, secret: trimmed)
+    }
+
+    private func refresh(
+        provider: ProviderDescriptor,
+        account: ProviderAccount,
+        secret: String) async throws -> ProviderUsageSnapshot
+    {
+        guard let endpoint = provider.endpoint else {
+            throw ProviderBalanceClientError.liveRefreshUnsupported(account.providerID)
+        }
         var request = URLRequest(url: account.baseURLOverride ?? endpoint.url)
         request.httpMethod = endpoint.method
         request.setValue("Bearer \(secret)", forHTTPHeaderField: "Authorization")

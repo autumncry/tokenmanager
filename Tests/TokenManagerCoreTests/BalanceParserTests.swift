@@ -30,6 +30,34 @@ final class BalanceParserTests: XCTestCase {
         XCTAssertTrue(snapshot.isAvailable)
     }
 
+    func testDeepSeekBalancePrefersPositiveCurrencyOverEmptyFirstRow() throws {
+        let data = """
+        {
+          "is_available": true,
+          "balance_infos": [
+            {
+              "currency": "USD",
+              "total_balance": "0.00",
+              "granted_balance": "0.00",
+              "topped_up_balance": "0.00"
+            },
+            {
+              "currency": "CNY",
+              "total_balance": "18.25",
+              "granted_balance": "8.25",
+              "topped_up_balance": "10.00"
+            }
+          ]
+        }
+        """.data(using: .utf8)!
+
+        let snapshot = try ProviderBalanceParser.parse(providerID: .deepSeek, data: data)
+
+        XCTAssertEqual(snapshot.balance?.amount, Decimal(string: "18.25"))
+        XCTAssertEqual(snapshot.balance?.currency, "CNY")
+        XCTAssertEqual(snapshot.breakdown.map(\.label), ["Granted", "Topped up"])
+    }
+
     func testParsesMoonshotBalanceResponse() throws {
         let data = """
         {

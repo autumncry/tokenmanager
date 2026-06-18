@@ -19,6 +19,18 @@ Provider support is descriptor-driven. Each provider entry declares:
 | OpenRouter | `https://openrouter.ai/api/v1/credits` | total credits minus total usage |
 | OpenAI | `https://api.openai.com/v1/organization/costs` | organization cost buckets |
 
+## Testing A Key
+
+The app Settings window now exposes the live adapter path directly: select a provider, paste the API key, then choose **Save & Refresh**. The key is stored in macOS Keychain and the balance request is sent directly from the user's Mac to the provider endpoint.
+
+For one-off checks without saving a key:
+
+```sh
+printf '%s' "$DEEPSEEK_API_KEY" | tokenmanagerctl balance --provider deepseek --stdin
+```
+
+Prefer `--stdin` over `--api-key` so the secret is not left in shell history.
+
 ## Catalog-First Providers
 
 These providers are represented in the app and config model now, with live adapters planned:

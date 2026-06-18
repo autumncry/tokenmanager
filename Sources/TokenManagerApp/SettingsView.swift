@@ -9,6 +9,15 @@ struct SettingsView: View {
         AppCopy(language: self.appLanguage)
     }
 
+    private var selectedProvider: ProviderDescriptor? {
+        if let selectedProviderID = self.model.selectedProviderID,
+           let provider = self.model.catalog.provider(id: selectedProviderID)
+        {
+            return provider
+        }
+        return self.model.catalog.providers.first
+    }
+
     var body: some View {
         TabView {
             self.providerSettings
@@ -29,19 +38,35 @@ struct SettingsView: View {
     }
 
     private var providerSettings: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            SettingsHeader(
-                title: self.copy.providers,
-                subtitle: self.copy.providersSubtitle,
-                symbol: "square.stack.3d.up")
+        HStack(spacing: 16) {
+            VStack(alignment: .leading, spacing: 12) {
+                SettingsHeader(
+                    title: self.copy.providers,
+                    subtitle: self.copy.providersSubtitle,
+                    symbol: "square.stack.3d.up")
 
-            List {
-                ForEach(self.model.catalog.providers) { provider in
-                    ProviderSettingRow(provider: provider)
+                List(selection: Binding<ProviderID?>(
+                    get: { self.model.selectedProviderID ?? self.model.catalog.providers.first?.id },
+                    set: { self.model.selectedProviderID = $0 }))
+                {
+                    ForEach(self.model.catalog.providers) { provider in
+                        ProviderSettingsListRow(provider: provider)
+                            .tag(provider.id)
+                    }
                 }
+                .listStyle(.sidebar)
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
             }
-            .listStyle(.inset(alternatesRowBackgrounds: true))
-            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .frame(width: 280)
+
+            if let provider = self.selectedProvider {
+                ProviderConnectionPane(provider: provider, copy: self.copy)
+            }
+        }
+        .onAppear {
+            if self.model.selectedProviderID == nil {
+                self.model.selectedProviderID = self.model.catalog.providers.first?.id
+            }
         }
     }
 
@@ -124,7 +149,7 @@ private struct SettingsHeader: View {
     }
 }
 
-private struct ProviderSettingRow: View {
+private struct ProviderSettingsListRow: View {
     @EnvironmentObject private var model: TokenManagerAppModel
     @AppStorage("appLanguage") private var appLanguage = "zh-Hans"
     let provider: ProviderDescriptor
@@ -135,9 +160,14 @@ private struct ProviderSettingRow: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            Image(systemName: self.provider.supportsLiveRefresh ? "bolt.fill" : "tray.and.arrow.down")
-                .foregroundStyle(self.provider.supportsLiveRefresh ? .green : .secondary)
-                .frame(width: 28)
+            ZStack {
+                RoundedRectangle(cornerRadius: 6, style: .continuous)
+                    .fill(self.statusColor.opacity(0.14))
+                Image(systemName: self.statusSymbol)
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(self.statusColor)
+            }
+            .frame(width: 28, height: 28)
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(self.provider.displayName)
@@ -149,13 +179,20 @@ private struct ProviderSettingRow: View {
             }
 
             Spacer()
-
-            Toggle("", isOn: Binding(
-                get: { self.model.isEnabled(self.provider.id) },
-                set: { self.model.setEnabled($0, providerID: self.provider.id) }))
-            .toggleStyle(.switch)
         }
         .padding(.vertical, 4)
+    }
+
+    private var statusSymbol: String {
+        if self.model.errors[self.provider.id] != nil { return "exclamationmark.triangle.fill" }
+        if self.model.hasCredential(self.provider.id) { return "key.fill" }
+        return self.provider.supportsLiveRefresh ? "bolt.fill" : "tray.and.arrow.down"
+    }
+
+    private var statusColor: Color {
+        if self.model.errors[self.provider.id] != nil { return .orange }
+        if self.model.hasCredential(self.provider.id) { return .green }
+        return self.provider.supportsLiveRefresh ? .blue : .secondary
     }
 
     private var detail: String {
@@ -163,8 +200,179 @@ private struct ProviderSettingRow: View {
             .map(\.rawValue)
             .sorted()
             .joined(separator: " · ")
-        let refresh = self.provider.supportsLiveRefresh ? self.copy.liveRefresh : self.copy.manualReady
+        let refresh: String
+        if self.model.hasCredential(self.provider.id) {
+            refresh = self.copy.savedCredential
+        } else {
+            refresh = self.provider.supportsLiveRefresh ? self.copy.liveRefresh : self.copy.manualReady
+        }
         return "\(refresh) · \(metrics)"
+    }
+}
+
+private struct ProviderConnectionPane: View {
+    @EnvironmentObject private var model: TokenManagerAppModel
+    let provider: ProviderDescriptor
+    let copy: AppCopy
+    @State private var accountName = ""
+    @State private var apiKey = ""
+    @State private var isSaving = false
+    @State private var isRefreshing = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack(alignment: .top, spacing: 12) {
+                Image(systemName: self.provider.supportsLiveRefresh ? "bolt.fill" : "tray.and.arrow.down")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(self.provider.supportsLiveRefresh ? .green : .secondary)
+                    .frame(width: 42, height: 42)
+                    .background(Color.secondary.opacity(0.10), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(self.provider.displayName)
+                        .font(.title3.weight(.semibold))
+                    Text(self.provider.implementationNote.isEmpty ? self.copy.defaultProviderNote(self.provider) : self.provider.implementationNote)
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                Spacer()
+            }
+
+            Divider()
+
+            Toggle(self.copy.menuBarTracking, isOn: Binding(
+                get: { self.model.isEnabled(self.provider.id) },
+                set: { self.model.setEnabled($0, providerID: self.provider.id) }))
+            .toggleStyle(.switch)
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text(self.copy.localCredential)
+                    .font(.headline)
+                Text(self.provider.supportsLiveRefresh ? self.copy.pasteKeyPrompt : self.copy.liveAdapterUnavailable)
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+
+                TextField(self.copy.accountName, text: self.$accountName)
+                    .textFieldStyle(.roundedBorder)
+
+                SecureField(
+                    self.provider.authMethods.contains(.accessKeySecret) ? self.copy.apiOrAccessKey : self.copy.apiKey,
+                    text: self.$apiKey)
+                    .textFieldStyle(.roundedBorder)
+                    .disabled(!self.provider.supportsLiveRefresh)
+
+                HStack {
+                    Button {
+                        Task { await self.saveAndRefresh() }
+                    } label: {
+                        Label(self.copy.saveKey, systemImage: "key.fill")
+                    }
+                    .disabled(!self.canSave)
+
+                    Button {
+                        Task { await self.refresh() }
+                    } label: {
+                        Label(self.copy.refreshBalance, systemImage: "arrow.clockwise")
+                    }
+                    .disabled(!self.canRefresh)
+
+                    Spacer()
+                }
+            }
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text(self.copy.latestResult)
+                    .font(.headline)
+                ProviderConnectionStatus(provider: self.provider, copy: self.copy)
+                if let endpoint = self.provider.endpoint {
+                    Label(endpoint.url.absoluteString, systemImage: "network")
+                        .font(.caption.monospaced())
+                        .foregroundStyle(.secondary)
+                        .textSelection(.enabled)
+                        .lineLimit(2)
+                }
+                if let dashboardURL = self.provider.dashboardURL {
+                    Link(destination: dashboardURL) {
+                        Label(self.copy.openDashboard, systemImage: "safari")
+                    }
+                }
+            }
+
+            Spacer()
+        }
+        .padding(18)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .onAppear(perform: self.resetFields)
+        .onChange(of: self.provider.id) { _, _ in self.resetFields() }
+    }
+
+    private var canSave: Bool {
+        self.provider.supportsLiveRefresh
+            && !self.isSaving
+            && !self.apiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    private var canRefresh: Bool {
+        self.provider.supportsLiveRefresh
+            && !self.isRefreshing
+            && self.model.hasCredential(self.provider.id)
+    }
+
+    private func resetFields() {
+        self.accountName = self.model.account(for: self.provider.id)?.displayName ?? "\(self.provider.shortName) account"
+        self.apiKey = ""
+    }
+
+    @MainActor
+    private func saveAndRefresh() async {
+        self.isSaving = true
+        defer { self.isSaving = false }
+        await self.model.saveAPIKey(self.apiKey, providerID: self.provider.id, displayName: self.accountName)
+        self.apiKey = ""
+    }
+
+    @MainActor
+    private func refresh() async {
+        self.isRefreshing = true
+        defer { self.isRefreshing = false }
+        await self.model.refresh(providerID: self.provider.id)
+    }
+}
+
+private struct ProviderConnectionStatus: View {
+    @EnvironmentObject private var model: TokenManagerAppModel
+    let provider: ProviderDescriptor
+    let copy: AppCopy
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Label(self.credentialText, systemImage: self.model.hasCredential(self.provider.id) ? "key.fill" : "key")
+                .foregroundStyle(self.model.hasCredential(self.provider.id) ? .green : .secondary)
+            if let snapshot = self.model.snapshots[self.provider.id] {
+                if let balance = snapshot.balance {
+                    Label(balance.displayString, systemImage: "creditcard")
+                        .foregroundStyle(.primary)
+                }
+                ForEach(snapshot.breakdown, id: \.label) { item in
+                    Text("\(item.label): \(item.currency) \(NSDecimalNumber(decimal: item.amount).stringValue)")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .textSelection(.enabled)
+                }
+            }
+            if let error = self.model.errors[self.provider.id] {
+                Label(error, systemImage: "exclamationmark.triangle.fill")
+                    .foregroundStyle(.orange)
+                    .textSelection(.enabled)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .font(.callout)
+    }
+
+    private var credentialText: String {
+        self.model.hasCredential(self.provider.id) ? self.copy.savedCredential : self.copy.noCredential
     }
 }
 
