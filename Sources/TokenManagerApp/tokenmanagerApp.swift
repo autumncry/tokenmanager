@@ -48,7 +48,7 @@ struct TokenManagerNativeApp: App {
         }
         .menuBarExtraStyle(.window)
 
-        WindowGroup("tokenmanager Quick View", id: "quick-preview") {
+        WindowGroup("tokenmanager 快速查看", id: "quick-preview") {
             MenuBarPanel()
                 .environmentObject(self.model)
                 .frame(width: 390)

@@ -3,7 +3,7 @@ import TokenManagerCore
 
 struct SettingsView: View {
     @EnvironmentObject private var model: TokenManagerAppModel
-    @AppStorage("appLanguage") private var appLanguage = "en"
+    @AppStorage("appLanguage") private var appLanguage = "zh-Hans"
 
     private var copy: AppCopy {
         AppCopy(language: self.appLanguage)
@@ -78,8 +78,8 @@ struct SettingsView: View {
                         .font(.headline)
                     Spacer()
                     Picker("", selection: self.$appLanguage) {
-                        Text("English").tag("en")
                         Text("中文").tag("zh-Hans")
+                        Text("English").tag("en")
                     }
                     .pickerStyle(.segmented)
                     .frame(width: 180)
@@ -126,7 +126,7 @@ private struct SettingsHeader: View {
 
 private struct ProviderSettingRow: View {
     @EnvironmentObject private var model: TokenManagerAppModel
-    @AppStorage("appLanguage") private var appLanguage = "en"
+    @AppStorage("appLanguage") private var appLanguage = "zh-Hans"
     let provider: ProviderDescriptor
 
     private var copy: AppCopy {

@@ -1,7 +1,7 @@
 {
   "name": "tokenmanager",
   "version": "0.1.0",
-  "description": "Local-first macOS menu bar app for tracking AI API balances, usage, quotas, and coding plans.",
+  "description": "100% local macOS menu bar app for safely tracking AI API balances, usage, quotas, and coding plans.",
   "license": "MIT",
   "type": "module",
   "bin": {

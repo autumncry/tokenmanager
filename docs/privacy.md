@@ -1,6 +1,6 @@
 # Privacy
 
-tokenmanager is local-first by design. It does not require, run, or contact a tokenmanager-owned server.
+tokenmanager is local-first by design. It does not require, run, or contact a tokenmanager-owned server. Account data, provider responses, and configuration stay on the user's Mac.
 
 ## Local Storage
 
@@ -9,6 +9,10 @@ tokenmanager is local-first by design. It does not require, run, or contact a to
 - Build artifacts: `dist/`
 
 The config file stores provider IDs, account display names, refresh preferences, and Keychain references. It must not store API key values, access tokens, or provider passwords.
+
+## No Project Server
+
+tokenmanager has no hosted backend, database, proxy, telemetry upload, or user-account system. From the tokenmanager project side, there is no server-side privacy collection surface.
 
 ## Network Model
 

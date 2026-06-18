@@ -3,7 +3,7 @@ import TokenManagerCore
 
 struct ContentView: View {
     @EnvironmentObject private var model: TokenManagerAppModel
-    @AppStorage("appLanguage") private var appLanguage = "en"
+    @AppStorage("appLanguage") private var appLanguage = "zh-Hans"
 
     var copy: AppCopy {
         AppCopy(language: self.appLanguage)
@@ -19,8 +19,8 @@ struct ContentView: View {
         .toolbar {
             ToolbarItemGroup {
                 Picker("", selection: self.$appLanguage) {
-                    Text("EN").tag("en")
                     Text("中文").tag("zh-Hans")
+                    Text("EN").tag("en")
                 }
                 .pickerStyle(.segmented)
                 .frame(width: 112)
@@ -375,12 +375,12 @@ struct AppCopy {
     var providers: String { self.pick("Providers", "厂商") }
     var providersSubtitle: String { self.pick("Enable the providers you want to track from the menu bar.", "启用需要在菜单栏追踪的模型厂商。") }
     var privacy: String { self.pick("Privacy", "隐私") }
-    var privacySubtitle: String { self.pick("All credentials and configuration stay on this Mac.", "所有凭据和配置都保留在这台 Mac。") }
+    var privacySubtitle: String { self.pick("All credentials, configuration, and account data stay on this Mac.", "所有凭据、配置和账户数据都保留在这台 Mac。") }
     var about: String { self.pick("About", "关于") }
-    var aboutSubtitle: String { self.pick("Local-first usage tracking for AI API accounts.", "面向 AI API 账户的本地优先用量追踪。") }
-    var aboutBody: String { self.pick("TokenManager is a native macOS menu bar app for balances, quotas, usage, and coding plans across mainstream AI providers. It has no project server and sends refresh requests directly from your Mac to the providers you enable.", "TokenManager 是原生 macOS 菜单栏应用，用于追踪主流 AI 厂商的余额、额度、用量与 Coding Plan。项目没有服务器，刷新请求只会从你的 Mac 直接发往已启用的厂商。") }
+    var aboutSubtitle: String { self.pick("100% local data tracking for AI API accounts.", "AI API 账户数据 100% 本地追踪。") }
+    var aboutBody: String { self.pick("TokenManager is a native macOS menu bar app for balances, quotas, usage, and coding plans across mainstream AI providers. It has no project server: keys stay in macOS Keychain, settings stay on disk, and refresh requests go directly from your Mac to the providers you enable.", "TokenManager 是原生 macOS 菜单栏应用，用于追踪主流 AI 厂商的余额、额度、用量与 Coding Plan。项目没有服务器：密钥保存在 macOS 钥匙串，设置保留在本机磁盘，刷新请求只会从你的 Mac 直接发往已启用的厂商。") }
     var languageLabel: String { self.pick("Language", "语言") }
-    var localOnly: String { self.pick("Local only", "仅本地") }
+    var localOnly: String { self.pick("100% local", "100% 本地") }
     var selectProvider: String { self.pick("Select a provider", "选择厂商") }
     var liveRefresh: String { self.pick("Live refresh", "实时刷新") }
     var manualReady: String { self.pick("Manual ready", "可手动记录") }

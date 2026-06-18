@@ -6,7 +6,7 @@ struct MenuBarPanel: View {
     @EnvironmentObject private var model: TokenManagerAppModel
     @Environment(\.openWindow) private var openWindow
     @Environment(\.openSettings) private var openSettings
-    @AppStorage("appLanguage") private var appLanguage = "en"
+    @AppStorage("appLanguage") private var appLanguage = "zh-Hans"
 
     private var copy: AppCopy {
         AppCopy(language: self.appLanguage)
@@ -36,7 +36,7 @@ struct MenuBarPanel: View {
         }
         .padding(16)
         .frame(width: 390)
-        .background(Color(nsColor: .windowBackgroundColor))
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
     }
 
     private var header: some View {
@@ -135,7 +135,7 @@ private struct MenuAccountRow: View {
         }
         .padding(12)
         .frame(maxWidth: .infinity, minHeight: 70, alignment: .leading)
-        .background(Color.secondary.opacity(0.08), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
     }
 
     private func detail(provider: ProviderDescriptor?, snapshot: ProviderUsageSnapshot?) -> String {
