@@ -2,11 +2,13 @@ import Foundation
 
 public enum ProviderID: String, CaseIterable, Codable, Hashable, Identifiable, Sendable {
     case openAI = "openai"
+    case codex
     case anthropic
     case googleGemini = "google-gemini"
     case xAI = "xai"
     case mistral
     case openRouter = "openrouter"
+    case openCode = "opencode"
     case groq
     case togetherAI = "together-ai"
     case cohere
@@ -15,9 +17,15 @@ public enum ProviderID: String, CaseIterable, Codable, Hashable, Identifiable, S
 
     case deepSeek = "deepseek"
     case alibabaBailian = "alibaba-bailian"
+    case alibabaToken = "alibaba-token"
     case volcengineArk = "volcengine-ark"
+    case antigravity
+    case zAI = "zai"
     case zhipuBigModel = "zhipu-bigmodel"
     case moonshotKimi = "moonshot-kimi"
+    case kimiK2 = "kimi-k2"
+    case kilo
+    case kiro
     case baiduQianfan = "baidu-qianfan"
     case tencentHunyuan = "tencent-hunyuan"
     case siliconFlow = "siliconflow"

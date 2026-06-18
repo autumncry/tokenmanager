@@ -64,6 +64,28 @@ public enum DemoDataFactory {
                 source: "Demo: OpenRouter credits",
                 updatedAt: now),
             ProviderUsageSnapshot(
+                providerID: .miniMax,
+                accountName: "MiniMax-M2.7",
+                balance: nil,
+                quotaWindows: [
+                    QuotaWindow(
+                        id: "current-interval",
+                        title: "Current interval",
+                        used: Decimal(180),
+                        limit: Decimal(500),
+                        unit: "requests",
+                        resetsAt: nil),
+                    QuotaWindow(
+                        id: "current-week",
+                        title: "Current week",
+                        used: Decimal(900),
+                        limit: Decimal(5000),
+                        unit: "requests",
+                        resetsAt: nil),
+                ],
+                source: "Demo: MiniMax token plan remains",
+                updatedAt: now),
+            ProviderUsageSnapshot(
                 providerID: .siliconFlow,
                 accountName: "SiliconFlow Cloud",
                 balance: MoneyAmount(amount: Decimal(string: "88.88")!, currency: "CNY"),

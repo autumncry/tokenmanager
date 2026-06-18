@@ -18,6 +18,7 @@ Provider support is descriptor-driven. Each provider entry declares:
 | SiliconFlow | `https://api.siliconflow.com/v1/user/info` | account identity, free balance, charged balance, total balance |
 | OpenRouter | `https://openrouter.ai/api/v1/credits` | total credits minus total usage |
 | OpenAI | `https://api.openai.com/v1/organization/costs` | organization cost buckets |
+| MiniMax | `https://api.minimaxi.com/v1/token_plan/remains` | token-plan quota windows; converts remaining counts to used counts |
 
 ## Testing A Key
 
@@ -27,6 +28,7 @@ For one-off checks without saving a key:
 
 ```sh
 printf '%s' "$DEEPSEEK_API_KEY" | tokenmanagerctl balance --provider deepseek --stdin
+printf '%s' "$MINIMAX_API_KEY" | tokenmanagerctl balance --provider minimax --stdin
 ```
 
 Prefer `--stdin` over `--api-key` so the secret is not left in shell history.
@@ -35,24 +37,53 @@ Prefer `--stdin` over `--api-key` so the secret is not left in shell history.
 
 These providers are represented in the app and config model now, with live adapters planned:
 
-- Anthropic Claude
-- Google Gemini
+- Codex
+- Claude
+- Gemini
 - xAI Grok
 - Mistral AI
+- OpenCode
 - GroqCloud
 - Together AI
 - Cohere
 - Azure OpenAI
 - AWS Bedrock
 - Alibaba Bailian / Qwen
+- Alibaba Token
 - Volcengine Ark / Doubao / ByteDance
+- Antigravity
+- z.ai
 - Zhipu BigModel
+- Kimi K2
+- Kilo
+- Kiro
 - Baidu Qianfan / ERNIE
 - Tencent Hunyuan
-- MiniMax
 - StepFun
 - Baichuan AI
 - ModelScope
+
+## Provider Guides
+
+Each first-class provider can link from the app to a GitHub guide:
+
+- [Codex](providers/codex.md)
+- [Claude](providers/claude.md)
+- [Gemini](providers/gemini.md)
+- [OpenCode](providers/opencode.md)
+- [Alibaba](providers/alibaba.md)
+- [Alibaba Token](providers/alibaba-token.md)
+- [Antigravity](providers/antigravity.md)
+- [z.ai](providers/zai.md)
+- [MiniMax](providers/minimax.md)
+- [Kimi](providers/kimi.md)
+- [Kimi K2](providers/kimi-k2.md)
+- [Kilo](providers/kilo.md)
+- [Kiro](providers/kiro.md)
+- [OpenRouter](providers/openrouter.md)
+- [DeepSeek](providers/deepseek.md)
+- [StepFun](providers/stepfun.md)
+- [Volcengine Ark / Doubao](providers/volcengine-ark.md)
 
 ## Adding A Provider
 

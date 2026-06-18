@@ -44,4 +44,31 @@ final class ProviderCatalogTests: XCTestCase {
         XCTAssertTrue(provider.aliases.contains("doubao"))
         XCTAssertTrue(provider.supportedMetrics.contains(.codingPlan))
     }
+
+    func testCodingPlanProvidersHaveGithubGuidesAndCredentialLabels() throws {
+        let expected: [ProviderID] = [
+            .codex,
+            .anthropic,
+            .googleGemini,
+            .openCode,
+            .alibabaBailian,
+            .alibabaToken,
+            .antigravity,
+            .zAI,
+            .miniMax,
+            .moonshotKimi,
+            .kimiK2,
+            .kilo,
+            .kiro,
+            .openRouter,
+            .deepSeek,
+            .stepFun,
+        ]
+
+        for providerID in expected {
+            let provider = try XCTUnwrap(ProviderCatalog.default.provider(id: providerID), providerID.rawValue)
+            XCTAssertFalse(provider.credentialLabel.isEmpty, providerID.rawValue)
+            XCTAssertEqual(provider.guideURL?.host(), "github.com", providerID.rawValue)
+        }
+    }
 }

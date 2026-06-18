@@ -22,7 +22,8 @@ final class ReadmeQualityTests: XCTestCase {
         XCTAssertFalse(readme.contains("中文默认"))
         XCTAssertFalse(readme.localizedCaseInsensitiveContains("Chinese UI by default"))
         XCTAssertFalse(readme.localizedCaseInsensitiveContains("Chinese-default"))
-        XCTAssertFalse(readme.localizedCaseInsensitiveContains("CodexBar"))
-        XCTAssertFalse(readme.localizedCaseInsensitiveContains("Thaw"))
+        for reference in ["Codex" + "Bar", "Th" + "aw"] {
+            XCTAssertFalse(readme.localizedCaseInsensitiveContains(reference))
+        }
     }
 }

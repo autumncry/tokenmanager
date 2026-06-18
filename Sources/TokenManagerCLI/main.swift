@@ -42,6 +42,8 @@ enum TokenManagerCLI {
                     id: provider.id.rawValue,
                     displayName: provider.displayName,
                     liveRefresh: provider.supportsLiveRefresh,
+                    credentialLabel: provider.credentialLabel,
+                    guideURL: provider.guideURL?.absoluteString,
                     metrics: provider.supportedMetrics.map(\.rawValue).sorted())
             }
             let data = try JSONEncoder.tokenManager.encode(payload)
@@ -51,7 +53,7 @@ enum TokenManagerCLI {
 
         for provider in providers {
             let live = provider.supportsLiveRefresh ? "live" : "manual"
-            print("\(provider.id.rawValue)\t\(provider.displayName)\t\(live)")
+            print("\(provider.id.rawValue)\t\(provider.displayName)\t\(live)\t\(provider.credentialLabel)")
         }
     }
 
@@ -100,6 +102,11 @@ enum TokenManagerCLI {
         print("\(provider.displayName)\t\(balance)")
         for item in snapshot.breakdown {
             print("\(item.label)\t\(item.currency) \(NSDecimalNumber(decimal: item.amount).stringValue)")
+        }
+        for window in snapshot.quotaWindows {
+            let used = window.used.map { NSDecimalNumber(decimal: $0).stringValue } ?? "—"
+            let limit = window.limit.map { NSDecimalNumber(decimal: $0).stringValue } ?? "—"
+            print("\(window.title)\t\(used)/\(limit) \(window.unit)")
         }
     }
 
@@ -218,6 +225,8 @@ private struct ProviderPayload: Encodable {
     let id: String
     let displayName: String
     let liveRefresh: Bool
+    let credentialLabel: String
+    let guideURL: String?
     let metrics: [String]
 }
 

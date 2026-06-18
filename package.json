@@ -1,7 +1,7 @@
 {
   "name": "tokenmanager",
   "version": "0.1.0",
-  "description": "100% local macOS menu bar app for safely tracking AI API balances, usage, quotas, and coding plans.",
+  "description": "TokenManager is a 100% local macOS menu bar app for safely tracking AI API balances, usage, quotas, and coding plans.",
   "license": "MIT",
   "type": "module",
   "bin": {
@@ -14,6 +14,7 @@
     "Tests",
     "script",
     "npm",
+    "site",
     "docs",
     "README.md",
     "LICENSE"
@@ -44,5 +45,5 @@
   "bugs": {
     "url": "https://github.com/autumncry/tokenmanager/issues"
   },
-  "homepage": "https://github.com/autumncry/tokenmanager#readme"
+  "homepage": "https://github.com/autumncry/tokenmanager/tree/main/site"
 }

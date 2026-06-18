@@ -35,12 +35,12 @@ final class TokenManagerAppModel: ObservableObject {
 
     var menuTitle: String {
         let enabled = self.enabledAccounts.count
-        guard enabled > 0 else { return "tokenmanager" }
+        guard enabled > 0 else { return "TokenManager" }
         let staleCount = self.errors.count
         if staleCount > 0 {
-            return "tokenmanager \(enabled)/\(staleCount)"
+            return "TokenManager \(enabled)/\(staleCount)"
         }
-        return "tokenmanager \(enabled)"
+        return "TokenManager \(enabled)"
     }
 
     func account(for providerID: ProviderID) -> ProviderAccount? {

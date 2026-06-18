@@ -23,7 +23,7 @@ struct TokenManagerNativeApp: App {
     @StateObject private var model = TokenManagerAppModel()
 
     var body: some Scene {
-        WindowGroup("tokenmanager", id: "main") {
+        WindowGroup("TokenManager", id: "main") {
             ContentView()
                 .environmentObject(self.model)
                 .frame(minWidth: 980, minHeight: 560)
@@ -48,7 +48,7 @@ struct TokenManagerNativeApp: App {
         }
         .menuBarExtraStyle(.window)
 
-        WindowGroup("tokenmanager 快速查看", id: "quick-preview") {
+        WindowGroup("TokenManager 快速查看", id: "quick-preview") {
             MenuBarPanel()
                 .environmentObject(self.model)
                 .frame(width: 390)

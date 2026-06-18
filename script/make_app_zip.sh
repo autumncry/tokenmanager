@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 VERSION="${TOKENMANAGER_VERSION:-0.1.0}"
 DIST_DIR="$ROOT_DIR/dist"
-APP_BUNDLE="$DIST_DIR/tokenmanager.app"
+APP_BUNDLE="$DIST_DIR/TokenManager.app"
 ZIP_PATH="$DIST_DIR/tokenmanager-$VERSION.app.zip"
 
 "$ROOT_DIR/script/package_app.sh" >/dev/null

@@ -32,6 +32,31 @@ final class ProviderBalanceClientTests: XCTestCase {
         XCTAssertEqual(loader.requests.first?.url?.absoluteString, "https://api.deepseek.com/user/balance")
         XCTAssertEqual(loader.requests.first?.value(forHTTPHeaderField: "Authorization"), "Bearer sk-test-inline")
     }
+
+    func testRefreshesMiniMaxCodingPlanFromInlineAPIKey() async throws {
+        let loader = RecordingHTTPDataLoader(data: """
+        {
+          "data": {
+            "model": "MiniMax-M2.7",
+            "current_interval_total_count": 100,
+            "current_interval_usage_count": 75
+          }
+        }
+        """.data(using: .utf8)!)
+        let client = ProviderBalanceClient(
+            credentialStore: InMemoryCredentialStore(),
+            httpClient: loader)
+
+        let snapshot = try await client.refresh(
+            providerID: .miniMax,
+            apiKey: "sk-test-minimax",
+            displayName: "MiniMax test")
+
+        XCTAssertEqual(snapshot.quotaWindows.first?.used, Decimal(25))
+        XCTAssertEqual(loader.requests.count, 1)
+        XCTAssertEqual(loader.requests.first?.url?.absoluteString, "https://api.minimaxi.com/v1/token_plan/remains")
+        XCTAssertEqual(loader.requests.first?.value(forHTTPHeaderField: "Authorization"), "Bearer sk-test-minimax")
+    }
 }
 
 private final class RecordingHTTPDataLoader: HTTPDataLoading, @unchecked Sendable {

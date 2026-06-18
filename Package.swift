@@ -2,7 +2,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "tokenmanager",
+    name: "TokenManager",
     platforms: [
         .macOS(.v14),
     ],

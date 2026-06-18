@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const script = join(root, "script", "package_app.sh");
-const app = join(root, "dist", "tokenmanager.app");
+const app = join(root, "dist", "TokenManager.app");
 const command = process.argv[2] ?? "launch";
 
 function run(cmd, args, options = {}) {
@@ -22,7 +22,7 @@ switch (command) {
     run(script, []);
     run("osascript", [
       "-e",
-      `do shell script "ditto '${app.replaceAll("'", "'\\''")}' '/Applications/tokenmanager.app'" with administrator privileges`
+      `do shell script "ditto '${app.replaceAll("'", "'\\''")}' '/Applications/TokenManager.app'" with administrator privileges`
     ]);
     break;
   case "launch":

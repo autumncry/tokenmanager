@@ -37,6 +37,8 @@ public enum ProviderBalanceParser {
             return try self.parseOpenAICosts(json, receivedAt: receivedAt)
         case .volcengineArk:
             return try self.parseVolcengineCodingPlan(json, receivedAt: receivedAt)
+        case .miniMax:
+            return try self.parseMiniMaxCodingPlan(json, receivedAt: receivedAt)
         default:
             return try self.parseGeneric(providerID: providerID, json: json, receivedAt: receivedAt)
         }
@@ -216,6 +218,53 @@ public enum ProviderBalanceParser {
             quotaWindows: windows,
             source: "Volcengine Ark Coding Plan API",
             updatedAt: receivedAt)
+    }
+
+    private static func parseMiniMaxCodingPlan(_ json: [String: Any], receivedAt: Date) throws -> ProviderUsageSnapshot {
+        let data = dictionary(json["data"]) ?? dictionary(json["result"]) ?? json
+        var windows: [QuotaWindow] = []
+
+        if let total = decimal(data["current_interval_total_count"]),
+           let remaining = decimal(data["current_interval_usage_count"])
+        {
+            windows.append(.init(
+                id: "current-interval",
+                title: "Current interval",
+                used: self.usedQuota(total: total, remaining: remaining),
+                limit: total,
+                unit: "requests",
+                resetsAt: date(data["current_interval_end_time"] ?? data["current_interval_reset_at"])))
+        }
+
+        if let total = decimal(data["current_weekly_total_count"]),
+           let remaining = decimal(data["current_weekly_usage_count"])
+        {
+            windows.append(.init(
+                id: "current-week",
+                title: "Current week",
+                used: self.usedQuota(total: total, remaining: remaining),
+                limit: total,
+                unit: "requests",
+                resetsAt: date(data["current_weekly_end_time"] ?? data["current_weekly_reset_at"])))
+        }
+
+        let balance = decimal(data["balance"] ?? data["available_balance"] ?? data["remaining_balance"])
+        guard balance != nil || !windows.isEmpty else {
+            throw ProviderBalanceParserError.missingExpectedFields(.miniMax)
+        }
+
+        return ProviderUsageSnapshot(
+            providerID: .miniMax,
+            accountName: string(data["model"] ?? data["model_name"] ?? data["name"]),
+            balance: balance.map { MoneyAmount(amount: $0, currency: string(data["currency"]) ?? "CNY") },
+            quotaWindows: windows,
+            source: "MiniMax token plan remains API",
+            updatedAt: receivedAt)
+    }
+
+    private static func usedQuota(total: Decimal, remaining: Decimal) -> Decimal {
+        let used = total - remaining
+        return used < 0 ? Decimal(0) : used
     }
 
     private static func parseGeneric(

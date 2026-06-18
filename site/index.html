@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>TokenManager - Local AI API Usage Tracker</title>
+    <meta name="description" content="TokenManager is a 100% local macOS menu bar app for AI API balances, usage, quota windows, and coding plans.">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="TokenManager home">
+        <span class="brand-mark">T</span>
+        <span>TokenManager</span>
+      </a>
+      <nav aria-label="Primary">
+        <a href="#providers">Providers</a>
+        <a href="#privacy">Privacy</a>
+        <a href="#install">Install</a>
+        <a href="https://github.com/autumncry/tokenmanager">GitHub</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-media" aria-hidden="true"></div>
+        <div class="hero-copy">
+          <p class="eyebrow">macOS menu bar · local only · no project server</p>
+          <h1 id="hero-title">TokenManager</h1>
+          <p class="hero-subtitle">
+            Track AI API balances, coding-plan quotas, usage windows, and provider status from one native menu bar app.
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="https://github.com/autumncry/tokenmanager">View on GitHub</a>
+            <a class="button secondary" href="#install">Install</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="security-band" id="privacy" aria-label="Privacy guarantees">
+        <div>
+          <strong>100% local data path</strong>
+          <span>API keys stay in macOS Keychain. Config stores references only.</span>
+        </div>
+        <div>
+          <strong>No TokenManager server</strong>
+          <span>No proxy, no cloud sync, no account database.</span>
+        </div>
+        <div>
+          <strong>Direct provider calls</strong>
+          <span>Refresh requests go from your Mac to the provider APIs you enable.</span>
+        </div>
+      </section>
+
+      <section class="product-section" aria-labelledby="app-title">
+        <div class="section-heading">
+          <p class="eyebrow">Native first</p>
+          <h2 id="app-title">Built for macOS status-bar workflows</h2>
+        </div>
+        <div class="screenshot-grid">
+          <img src="../docs/screenshots/tokenmanager-dashboard.png" alt="TokenManager dashboard window">
+          <img src="../docs/screenshots/tokenmanager-settings.png" alt="TokenManager provider settings window">
+          <img src="../docs/screenshots/tokenmanager-quick-view.png" alt="TokenManager menu bar quick view">
+        </div>
+      </section>
+
+      <section class="product-section" id="providers" aria-labelledby="provider-title">
+        <div class="section-heading">
+          <p class="eyebrow">Provider catalog</p>
+          <h2 id="provider-title">One menu bar for coding plans and API accounts</h2>
+          <p>Every highlighted provider links to a GitHub guide with credential type, endpoint status, and local-only handling notes.</p>
+        </div>
+        <div class="provider-grid">
+          <a class="provider-card live" href="https://github.com/autumncry/tokenmanager/blob/main/docs/providers/deepseek.md"><span>DeepSeek</span><small>API key · live balance</small></a>
+          <a class="provider-card live" href="https://github.com/autumncry/tokenmanager/blob/main/docs/providers/minimax.md"><span>MiniMax</span><small>API key · coding plan</small></a>
+          <a class="provider-card live" href="https://github.com/autumncry/tokenmanager/blob/main/docs/providers/openrouter.md"><span>OpenRouter</span><small>API key · credits</small></a>
+          <a class="provider-card live" href="https://github.com/autumncry/tokenmanager/blob/main/docs/providers/kimi.md"><span>Kimi</span><small>Token · balance</small></a>
+          <a class="provider-card" href="https://github.com/autumncry/tokenmanager/blob/main/docs/providers/volcengine-ark.md"><span>Volcengine Ark</span><small>API key / AK-SK</small></a>
+          <a class="provider-card" href="https://github.com/autumncry/tokenmanager/blob/main/docs/providers/stepfun.md"><span>StepFun</span><small>Step Plan API key</small></a>
+          <a class="provider-card" href="https://github.com/autumncry/tokenmanager/blob/main/docs/providers/alibaba.md"><span>Alibaba</span><small>Cookies / API key</small></a>
+          <a class="provider-card" href="https://github.com/autumncry/tokenmanager/blob/main/docs/providers/alibaba-token.md"><span>Alibaba Token</span><small>Cookies</small></a>
+          <a class="provider-card" href="https://github.com/autumncry/tokenmanager/blob/main/docs/providers/codex.md"><span>Codex</span><small>OAuth</small></a>
+          <a class="provider-card" href="https://github.com/autumncry/tokenmanager/blob/main/docs/providers/claude.md"><span>Claude</span><small>OAuth / API key</small></a>
+          <a class="provider-card" href="https://github.com/autumncry/tokenmanager/blob/main/docs/providers/gemini.md"><span>Gemini</span><small>OAuth / API key</small></a>
+          <a class="provider-card" href="https://github.com/autumncry/tokenmanager/blob/main/docs/providers/opencode.md"><span>OpenCode</span><small>Cookies + Go</small></a>
+          <a class="provider-card" href="https://github.com/autumncry/tokenmanager/blob/main/docs/providers/zai.md"><span>z.ai</span><small>API key</small></a>
+          <a class="provider-card" href="https://github.com/autumncry/tokenmanager/blob/main/docs/providers/kilo.md"><span>Kilo</span><small>API key</small></a>
+          <a class="provider-card" href="https://github.com/autumncry/tokenmanager/blob/main/docs/providers/kiro.md"><span>Kiro</span><small>CLI</small></a>
+          <a class="provider-card" href="https://github.com/autumncry/tokenmanager/blob/main/docs/providers/antigravity.md"><span>Antigravity</span><small>Local</small></a>
+        </div>
+      </section>
+
+      <section class="install-section" id="install" aria-labelledby="install-title">
+        <div>
+          <p class="eyebrow">Install paths</p>
+          <h2 id="install-title">App bundle, package, DMG, or npm wrapper</h2>
+          <p>Use the native app for the menu bar experience, or use the CLI for one-off local balance checks.</p>
+        </div>
+        <div class="terminal" role="img" aria-label="Install commands">
+          <pre><code>npm install -g tokenmanager
+tokenmanager build
+tokenmanager launch
+
+printf '%s' "$DEEPSEEK_API_KEY" \
+  | tokenmanagerctl balance --provider deepseek --stdin</code></pre>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <span>TokenManager</span>
+      <a href="https://github.com/autumncry/tokenmanager">GitHub</a>
+      <a href="https://github.com/autumncry/tokenmanager/blob/main/docs/privacy.md">Privacy model</a>
+    </footer>
+  </body>
+</html>

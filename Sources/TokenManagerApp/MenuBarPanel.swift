@@ -42,7 +42,7 @@ struct MenuBarPanel: View {
     private var header: some View {
         HStack(spacing: 10) {
             VStack(alignment: .leading, spacing: 2) {
-                Text("tokenmanager")
+                Text("TokenManager")
                     .font(.system(size: 17, weight: .semibold))
                 Text(self.copy.menuSubtitle(self.model.enabledAccounts.count))
                     .font(.caption)

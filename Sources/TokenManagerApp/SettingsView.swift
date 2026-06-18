@@ -93,7 +93,7 @@ struct SettingsView: View {
     private var aboutSettings: some View {
         VStack(alignment: .leading, spacing: 18) {
             SettingsHeader(
-                title: "tokenmanager",
+                title: "TokenManager",
                 subtitle: self.copy.aboutSubtitle,
                 symbol: "chart.bar.xaxis")
 
@@ -206,7 +206,7 @@ private struct ProviderSettingsListRow: View {
         } else {
             refresh = self.provider.supportsLiveRefresh ? self.copy.liveRefresh : self.copy.manualReady
         }
-        return "\(refresh) · \(metrics)"
+        return "\(refresh) · \(self.provider.credentialLabel) · \(metrics)"
     }
 }
 
@@ -248,7 +248,7 @@ private struct ProviderConnectionPane: View {
             VStack(alignment: .leading, spacing: 8) {
                 Text(self.copy.localCredential)
                     .font(.headline)
-                Text(self.provider.supportsLiveRefresh ? self.copy.pasteKeyPrompt : self.copy.liveAdapterUnavailable)
+                Text(self.provider.supportsLiveRefresh ? self.copy.pasteKeyPrompt(self.provider) : self.copy.liveAdapterUnavailable)
                     .font(.callout)
                     .foregroundStyle(.secondary)
 
@@ -256,7 +256,7 @@ private struct ProviderConnectionPane: View {
                     .textFieldStyle(.roundedBorder)
 
                 SecureField(
-                    self.provider.authMethods.contains(.accessKeySecret) ? self.copy.apiOrAccessKey : self.copy.apiKey,
+                    self.copy.credentialPlaceholder(self.provider),
                     text: self.$apiKey)
                     .textFieldStyle(.roundedBorder)
                     .disabled(!self.provider.supportsLiveRefresh)
@@ -294,6 +294,16 @@ private struct ProviderConnectionPane: View {
                 if let dashboardURL = self.provider.dashboardURL {
                     Link(destination: dashboardURL) {
                         Label(self.copy.openDashboard, systemImage: "safari")
+                    }
+                }
+                if let guideURL = self.provider.guideURL {
+                    Link(destination: guideURL) {
+                        Label(self.copy.providerGuide, systemImage: "book")
+                    }
+                }
+                if let docsURL = self.provider.docsURL {
+                    Link(destination: docsURL) {
+                        Label(self.copy.providerDocs, systemImage: "doc.text")
                     }
                 }
             }
@@ -356,6 +366,12 @@ private struct ProviderConnectionStatus: View {
                 }
                 ForEach(snapshot.breakdown, id: \.label) { item in
                     Text("\(item.label): \(item.currency) \(NSDecimalNumber(decimal: item.amount).stringValue)")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .textSelection(.enabled)
+                }
+                ForEach(snapshot.quotaWindows) { window in
+                    Text("\(window.title): \(self.copy.windowUsage(window))")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .textSelection(.enabled)

@@ -116,4 +116,31 @@ final class BalanceParserTests: XCTestCase {
         XCTAssertEqual(snapshot.limit?.amount, Decimal(string: "100"))
         XCTAssertEqual(snapshot.balance?.currency, "USD")
     }
+
+    func testParsesMiniMaxCodingPlanRemainsAsRemainingQuota() throws {
+        let data = """
+        {
+          "data": {
+            "model": "MiniMax-M2.7",
+            "current_interval_total_count": 500,
+            "current_interval_usage_count": 320,
+            "current_weekly_total_count": 5000,
+            "current_weekly_usage_count": 4100
+          }
+        }
+        """.data(using: .utf8)!
+
+        let snapshot = try ProviderBalanceParser.parse(providerID: .miniMax, data: data)
+
+        XCTAssertEqual(snapshot.providerID, .miniMax)
+        XCTAssertEqual(snapshot.accountName, "MiniMax-M2.7")
+        XCTAssertEqual(snapshot.quotaWindows.count, 2)
+        XCTAssertEqual(snapshot.quotaWindows[0].id, "current-interval")
+        XCTAssertEqual(snapshot.quotaWindows[0].used, Decimal(180))
+        XCTAssertEqual(snapshot.quotaWindows[0].limit, Decimal(500))
+        XCTAssertEqual(snapshot.quotaWindows[0].unit, "requests")
+        XCTAssertEqual(snapshot.quotaWindows[1].id, "current-week")
+        XCTAssertEqual(snapshot.quotaWindows[1].used, Decimal(900))
+        XCTAssertEqual(snapshot.quotaWindows[1].limit, Decimal(5000))
+    }
 }

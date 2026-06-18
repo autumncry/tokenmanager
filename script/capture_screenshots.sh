@@ -8,7 +8,7 @@ APP_BUNDLE="$("$ROOT_DIR/script/package_app.sh" | tail -n 1)"
 mkdir -p "$OUT_DIR"
 
 quit_tokenmanager() {
-  osascript -e 'tell application "tokenmanager" to quit' >/dev/null 2>&1 || true
+  osascript -e 'tell application "TokenManager" to quit' >/dev/null 2>&1 || true
   pkill -x tokenmanager >/dev/null 2>&1 || true
 }
 

@@ -70,7 +70,7 @@ private struct ProviderSidebar: View {
             }
         }
         .listStyle(.sidebar)
-        .navigationTitle("tokenmanager")
+        .navigationTitle("TokenManager")
         .safeAreaInset(edge: .bottom) {
             HStack(spacing: 8) {
                 Image(systemName: "lock.shield")
@@ -331,7 +331,7 @@ private struct CredentialCard: View {
             HStack(spacing: 12) {
                 TextField(self.copy.accountName, text: self.$displayName)
                     .textFieldStyle(.roundedBorder)
-                SecureField(self.provider.authMethods.contains(.accessKeySecret) ? self.copy.apiOrAccessKey : self.copy.apiKey, text: self.$apiKey)
+                SecureField(self.copy.credentialPlaceholder(self.provider), text: self.$apiKey)
                     .textFieldStyle(.roundedBorder)
                 Button {
                     self.save()
@@ -362,8 +362,13 @@ private struct ProviderNotesCard: View {
                     .foregroundStyle(.orange)
                     .textSelection(.enabled)
             }
-            if let docsURL = provider.docsURL {
-                Link(self.copy.providerDocs, destination: docsURL)
+            HStack(spacing: 12) {
+                if let guideURL = provider.guideURL {
+                    Link(self.copy.providerGuide, destination: guideURL)
+                }
+                if let docsURL = provider.docsURL {
+                    Link(self.copy.providerDocs, destination: docsURL)
+                }
             }
         }
         .padding(18)
@@ -420,12 +425,12 @@ struct AppCopy {
     var menuBarTracking: String { self.pick("Track in menu bar", "在菜单栏追踪") }
     var savedCredential: String { self.pick("Saved in Keychain", "已保存到钥匙串") }
     var noCredential: String { self.pick("No API key saved", "未保存 API Key") }
-    var pasteKeyPrompt: String { self.pick("Paste an API key. It is written only to macOS Keychain.", "粘贴 API Key。它只会写入 macOS 钥匙串。") }
     var endpoint: String { self.pick("Endpoint", "接口") }
     var latestResult: String { self.pick("Latest result", "最新结果") }
     var liveAdapterUnavailable: String { self.pick("Live balance refresh is not connected for this provider yet.", "该厂商暂未接入实时余额刷新。") }
     var providerNotes: String { self.pick("Provider notes", "厂商说明") }
     var providerDocs: String { self.pick("Provider API docs", "厂商 API 文档") }
+    var providerGuide: String { self.pick("GitHub guide", "GitHub 指南") }
 
     func providerSubtitle(_ provider: ProviderDescriptor) -> String {
         provider.supportsLiveRefresh
@@ -449,6 +454,16 @@ struct AppCopy {
         provider.supportsLiveRefresh
             ? self.pick("This provider has a live API adapter.", "该厂商已支持实时 API 适配。")
             : self.pick("This provider is available for local tracking while a live adapter is added.", "该厂商可用于本地记录，实时适配器可在同一架构下补充。")
+    }
+
+    func credentialPlaceholder(_ provider: ProviderDescriptor) -> String {
+        self.pick(provider.credentialLabel, provider.credentialLabel)
+    }
+
+    func pasteKeyPrompt(_ provider: ProviderDescriptor) -> String {
+        self.pick(
+            "Paste \(provider.credentialLabel). It is written only to macOS Keychain.",
+            "粘贴 \(provider.credentialLabel)。它只会写入 macOS 钥匙串。")
     }
 
     private func pick(_ english: String, _ chinese: String) -> String {

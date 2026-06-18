@@ -1,6 +1,6 @@
 # Packaging
 
-tokenmanager supports three local packaging paths.
+TokenManager supports three local packaging paths.
 
 ## App Bundle
 
@@ -11,7 +11,7 @@ tokenmanager supports three local packaging paths.
 Output:
 
 ```text
-dist/tokenmanager.app
+dist/TokenManager.app
 ```
 
 The app bundle includes:
@@ -34,7 +34,7 @@ Output:
 dist/tokenmanager-0.1.0.pkg
 ```
 
-The package installs `tokenmanager.app` into `/Applications`.
+The package installs `TokenManager.app` into `/Applications`.
 
 ## Zipped App Bundle
 
@@ -62,7 +62,7 @@ Output:
 dist/tokenmanager-0.1.0.dmg
 ```
 
-The DMG contains `tokenmanager.app` and an `/Applications` shortcut.
+The DMG contains `TokenManager.app` and an `/Applications` shortcut.
 
 ## npm
 

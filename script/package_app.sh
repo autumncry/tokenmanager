@@ -2,7 +2,8 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-APP_NAME="tokenmanager"
+APP_NAME="TokenManager"
+APP_EXECUTABLE="tokenmanager"
 BUNDLE_ID="app.tokenmanager"
 VERSION="${TOKENMANAGER_VERSION:-0.1.0}"
 BUILD_NUMBER="${TOKENMANAGER_BUILD:-1}"
@@ -20,9 +21,9 @@ BUILD_BIN_DIR="$(swift build -c release --show-bin-path)"
 
 rm -rf "$APP_BUNDLE"
 mkdir -p "$APP_MACOS" "$APP_CONTENTS/Resources"
-cp "$BUILD_BIN_DIR/tokenmanager" "$APP_MACOS/tokenmanager"
+cp "$BUILD_BIN_DIR/$APP_EXECUTABLE" "$APP_MACOS/$APP_EXECUTABLE"
 cp "$BUILD_BIN_DIR/tokenmanagerctl" "$APP_MACOS/tokenmanagerctl"
-chmod +x "$APP_MACOS/tokenmanager" "$APP_MACOS/tokenmanagerctl"
+chmod +x "$APP_MACOS/$APP_EXECUTABLE" "$APP_MACOS/tokenmanagerctl"
 
 cat >"$INFO_PLIST" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
@@ -30,13 +31,13 @@ cat >"$INFO_PLIST" <<PLIST
 <plist version="1.0">
 <dict>
   <key>CFBundleExecutable</key>
-  <string>tokenmanager</string>
+  <string>$APP_EXECUTABLE</string>
   <key>CFBundleIdentifier</key>
   <string>$BUNDLE_ID</string>
   <key>CFBundleName</key>
-  <string>tokenmanager</string>
+  <string>$APP_NAME</string>
   <key>CFBundleDisplayName</key>
-  <string>tokenmanager</string>
+  <string>$APP_NAME</string>
   <key>CFBundlePackageType</key>
   <string>APPL</string>
   <key>CFBundleShortVersionString</key>
@@ -48,7 +49,7 @@ cat >"$INFO_PLIST" <<PLIST
   <key>LSUIElement</key>
   <true/>
   <key>NSHumanReadableCopyright</key>
-  <string>Copyright © 2026 tokenmanager contributors.</string>
+  <string>Copyright © 2026 TokenManager contributors.</string>
   <key>NSPrincipalClass</key>
   <string>NSApplication</string>
 </dict>
