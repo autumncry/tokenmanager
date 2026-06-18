@@ -173,10 +173,6 @@ docs                       隐私、厂商、打包和截图说明
 
 [tokenmanager macOS v1 design](https://www.figma.com/design/qhIgYsAXchCeFjvajVMONu)
 
-状态栏与快速查看界面提案文件：
-
-[tokenmanager menu bar proposal](https://www.figma.com/design/QF0mHClxfSVopROEFGEzeK)
-
 ### 路线图
 
 - 原生 macOS 菜单栏应用，包含仪表盘、设置页和 Quick View。
@@ -333,10 +329,6 @@ docs                       Privacy, provider, packaging, and screenshot notes
 The first macOS UI pass is documented in an editable Figma design file:
 
 [tokenmanager macOS v1 design](https://www.figma.com/design/qhIgYsAXchCeFjvajVMONu)
-
-Menu bar and Quick View proposal:
-
-[tokenmanager menu bar proposal](https://www.figma.com/design/QF0mHClxfSVopROEFGEzeK)
 
 ### Roadmap
 
